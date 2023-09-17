@@ -1,7 +1,10 @@
 import json
 import sys
 import os
+import urllib.parse
+
 import duckdb
+
 
 # global DB connection, to be reused across invocations
 conn = None
@@ -38,7 +41,10 @@ def get_conn_with_s3():
 
 def lambdaHandler(event, context):
     print(f"Hello lambda - DuckDb coming! Version: {sys.version}")
-    print(f"Payload: {event}\nQuery: {event['query']}")
+
+    qry = urllib.parse.unquote(event['query'])
+
+    print(f"Payload: {event}\nQuery: {qry}")
 
     s3_bucket = 'serverless-data'
 
@@ -52,7 +58,7 @@ def lambdaHandler(event, context):
 
     # _df = conn.execute(f"select count(*) from 's3://sd-demo-bucket/data/compensated_nyc_trips.parquet'").df()
     # _df = conn.execute(f"select count(*) from 's3://{s3_bucket}/*.parquet'").df()
-    _df = conn.execute(event['query']).df()
+    _df = conn.execute(qry).df()
     print(f"Dataframe got from the data.")
 
     return {
