@@ -1,0 +1,3 @@
+/assume-role-output.json
+/.env.docker.local
+/.venv/
