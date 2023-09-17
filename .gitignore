@@ -1,3 +1,5 @@
 /assume-role-output.json
 /.env.docker.local
 /.venv/
+/lambda_update_res.json
+/response.json

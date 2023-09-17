@@ -14,8 +14,8 @@ rows_limit = 10
 
 def get_conn_with_s3():
     s3_region = os.environ['AWS_REGION']
-    s3_key = os.environ['AWS_KEY_ID']
-    s3_secret = os.environ['AWS_SECRET_KEY']
+    s3_key = os.environ['AWS_ACCESS_KEY_ID']
+    s3_secret = os.environ['AWS_SECRET_ACCESS_KEY']
     s3_session = os.environ['AWS_SESSION_TOKEN']
 
     conn = duckdb.connect(database=':memory:')
@@ -51,9 +51,6 @@ def lambdaHandler(event, context):
         qry = f"select count(*) from 's3://{s3_bucket}/yellow_tripdata_2023-04.parquet'"
         print(f"Payload: {event}\nNo query passed - using default: {qry}")
 
-
-
-
     global conn
 
     if conn is None:
@@ -77,14 +74,16 @@ def lambdaHandler(event, context):
     }
 
 if __name__ == "__main__":
+    print("Run in standalone mode - main started.")
+
     if os.getenv('AWS_REGION') is None:
         os.environ['AWS_REGION'] = 'eu-west-3'
 
         f = open('assume-role-output.json')
         data = json.load(f)
 
-        os.environ['AWS_KEY_ID'] = data['Credentials']['AccessKeyId']
-        os.environ['AWS_SECRET_KEY'] = data['Credentials']['SecretAccessKey']
+        os.environ['AWS_ACCESS_KEY_ID'] = data['Credentials']['AccessKeyId']
+        os.environ['AWS_SECRET_ACCESS_KEY'] = data['Credentials']['SecretAccessKey']
         os.environ['AWS_SESSION_TOKEN'] = data['Credentials']['SessionToken']
 
     res = lambdaHandler({"query": "select count(*) from 's3://serverless-data/*.parquet'"}, None)
