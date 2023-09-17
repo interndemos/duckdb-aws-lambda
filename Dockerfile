@@ -5,6 +5,8 @@ RUN pip3 install --upgrade pip \
 
 RUN pip3 install pandas==2.0.3 duckdb==0.8.1 --target "${LAMBDA_TASK_ROOT}"
 
+ENV HOME=${LAMBDA_TASK_ROOT}
+
 RUN python3 -c "import duckdb; duckdb.query('INSTALL httpfs;');"
 
 # RUN echo ${LAMBDA_TASK_ROOT}
