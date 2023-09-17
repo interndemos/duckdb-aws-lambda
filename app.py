@@ -42,11 +42,17 @@ def get_conn_with_s3():
 def lambdaHandler(event, context):
     print(f"Hello lambda - DuckDb coming! Version: {sys.version}")
 
-    qry = urllib.parse.unquote(event['query'])
-
-    print(f"Payload: {event}\nQuery: {qry}")
-
     s3_bucket = 'serverless-data'
+
+    if 'query' in event:
+        qry = urllib.parse.unquote(event['query'])
+        print(f"Payload: {event}\nQuery: {qry}")
+    else:
+        qry = f"select count(*) from 's3://{s3_bucket}/yellow_tripdata_2023-04.parquet'"
+        print(f"Payload: {event}\nNo query passed - using default: {qry}")
+
+
+
 
     global conn
 
@@ -57,15 +63,15 @@ def lambdaHandler(event, context):
         print(f"Connection already exists - assuming warm run.")
 
     # _df = conn.execute(f"select count(*) from 's3://sd-demo-bucket/data/compensated_nyc_trips.parquet'").df()
-    # _df = conn.execute(f"select count(*) from 's3://{s3_bucket}/*.parquet'").df()
     _df = conn.execute(qry).df()
+
     print(f"Dataframe got from the data.")
 
     return {
         "statusCode": 200,
         "body": json.dumps({
             "message": "Hello from Lambda - DuckDb coming!",
-            "query": event['query'],
+            "query": qry,
             "data": _df.to_json()
         }),
     }
@@ -82,5 +88,6 @@ if __name__ == "__main__":
         os.environ['AWS_SESSION_TOKEN'] = data['Credentials']['SessionToken']
 
     res = lambdaHandler({"query": "select count(*) from 's3://serverless-data/*.parquet'"}, None)
+    # res = lambdaHandler({}, None)
 
     print(res)
