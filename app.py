@@ -40,7 +40,7 @@ def get_conn_with_s3():
     return conn
 
 def lambdaHandler(event, context):
-    print(f"Hello lambda - DuckDb coming! Version: {sys.version}")
+    print(f"Hello lambda - DuckDb coming! Version: {sys.version}; Man ID: 3")
 
     s3_bucket = 'serverless-data'
 
