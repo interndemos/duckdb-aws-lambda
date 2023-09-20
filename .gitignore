@@ -3,3 +3,4 @@
 /.venv/
 /lambda_update_res.json
 /response.json
+/lambda-response.json
